@@ -1,0 +1,676 @@
+---
+title: Arch 安装及初始化配置
+description: UEFI system-boot btrfs  @ @home kde plasma
+date: 	2022-05-31 23:28
+lastmod: 	2022-05-31 23:28
+tags:
+  - linux
+  - arch
+head:
+  - - meta
+    - name: keywords
+      content: Arch 安装及初始化配置 UEFI system-boot btrfs  @ @home kde plasma
+---
+
+> [arch wiki](https://wiki.archlinux.org/title/Installation_guide_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
+> [安装参考1](https://www.bilibili.com/video/BV1ub4y1Y7pK?spm_id_from=333.1007.top_right_bar_window_custom_collection.content.click) | 
+> [安装参考2](https://www.bilibili.com/video/BV1Wu411o7Kd) | 
+> [安装参考3](https://www.jianshu.com/p/7c2ab582e13d) | 
+> [安装参考4](https://www.jianshu.com/p/5e7726d1cb16) | 
+> [安装参考5](https://github.com/ArchLinuxStudio/ArchLinuxTutorial)  | 
+> [安装参考6](https://www.youtube.com/watch?v=HIXnT178TgI&list=PL-odKaUzOz3IT3FLQlXFaRVyNpWW1nj68&index=204) | 
+>
+> UEFI system-boot  
+>
+> btrfs  @ @home
+>
+> kde plasma
+
+完整目录：
+[toc]
+
+## 调整控制台字体（可选）
+
+> 以大号字体显示
+
+```bash
+setfont ter-132n
+```
+
+## 修改 root 密码
+
+```bash
+passwd
+```
+
+## 无线连接
+
+```bash
+iwctl
+
+device list
+
+# <name> 为 device list 打印列表你中的名字，如 `station wlan0 scan`
+station <name> scan
+
+station <name> get-network
+
+# <ssid> 为 wifi名称
+station <name> connect <ssid>
+
+quit
+
+# 测试网络连接
+ping archlinux.org
+```
+
+## ssh 安装 （可选）
+
+> 以远控安装  
+>
+> 远控安装时建议目标机器一直处于 ping 状态
+
+```bash
+pacman -Syy openssh
+
+systemctl start sshd
+
+# 查看 ip
+ip addr
+```
+
+```bash
+# 另一台电脑 提示输入密码为前面设置的 root 密码
+# <ip> 为上面查到的ip 地址，如： 192.168.1.80
+ssh root@<ip>
+```
+
+## 生成镜像源
+
+```bash
+# 先停用自动更新服务
+systemctl stop reflector.service
+
+# 然后手动按需生成
+## 位于中国 近12小时活跃 https协议 按速度排序 文件保存
+reflector --country China --age 12 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+
+# 查看生成结果
+cat /etc/pacman.d/mirrorlist
+
+# 刷新源
+pacman -Syy
+```
+
+## 磁盘分区
+
+> gdisk 操作可见 [安装参考1（00：13）](#安装参考1) 
+
+```bash
+lsblk
+
+# <disk> 为 lsblk 中对应的磁盘名，如 `gdisk /dev/nvme0n1`
+gdisk /dev/<disk>
+
+# ? 查看帮助 p 打印分区 d 删除分区 n 新建分区 w 应用修改且退出 q 直接退出
+
+
+# 1 ef00 +512M
+
+# 2 8300 
+## 容量留一些给后面的 swap，如果不打算设置swap分区，这里直接一路 enter 就可以
+## 后面使用中在想添加 swap 分区直接压缩一下 8300 的大小，然后在设置也方便
+
+# 3 8200 +2G 
+## [swap 分区大小参考](https://blog.csdn.net/sirchenhua/article/details/87861709)
+## [swap_arch wiki](https://wiki.archlinux.org/title/Swap_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))
+## 交换空间swap，放在最后，方便后面按需调整大小
+## 如果使用 zram 这里可以不进行 swap 分区
+## 如果此处不设置 swap，下面相关的swap 命令可省略
+```
+
+## 格式化
+
+```bash
+lsblk
+
+# <part> 为 lsblk 中 ef00 对应的分区名，如 `mkfs.fat -F 32 /dev/nvme0n1p1`
+mkfs.fat -F 32 /dev/<part>
+
+# <part> 为 lsblk 中 8300 对应的分区名，如 `mkfs.btrfs /dev/nvme0n1p2`
+# 如果提示分区已经为该分区已经为XXX 可添加参数强制格式化，`mkfs.btrfs /dev/nvme0n1p2 -f`
+mkfs.btrfs /dev/<part>
+
+# <part> 为 lsblk 中 8200 对应的分区名，如 `mkfs.btrfs /dev/nvme0n1p3`
+## 如果上面不设置 swap，命令可省略
+mkswap /dev/<part>
+
+# 查看格式化结果
+lsblk -f
+```
+
+## btrfs 子卷
+
+> 很大原因是为以后如果要使用 timeshift 的 btrfs 类型备份时做准备
+>
+> [In BTRFS mode, snapshots are taken using the in-built features of the BTRFS filesystem. BTRFS snapshots are supported only on BTRFS systems having an Ubuntu-type subvolume layout (with @ and @home subvolumes).](https://github.com/linuxmint/timeshift)
+
+```bash
+# <part> 为 lsblk 中 8300 对应的分区名，如 `mount /dev/nvme0n1p2 /mnt`
+mount /dev/<part> /mnt
+cd /mnt
+
+# 添加子卷 @ @home
+btrfs subvolume create @
+btrfs subvolume create @home
+
+cd 
+umount /mnt
+```
+
+## 挂载
+
+```bash
+# btrfsz子卷，<part> 为 lsblk 中 8300 对应的分区名，如 `nvme0n1p2`
+mount -o noatime,space_cache=v2,compress=zstd,ssd,discard=async,subvol=@ /dev/<part> /mnt 
+
+# 创建@home 及 efi 挂载位置
+mkdir /mnt/{boot,home}
+
+mount -o noatime,space_cache=v2,compress=zstd,ssd,discard=async,subvol=@home /dev/<part> /mnt/home
+
+# <part> 为 lsblk 中 ef00 对应的分区名，如 `mount /dev/nvme0n1p1 /mnt/boot`
+mount /dev/<part> /mnt/boot
+
+# <part> 为 lsblk 中 8200 对应的分区名，如 `swapon /dev/nvme0n1p3`
+## 如果上面不设置 swap，命令可省略
+swapon /dev/<part>
+
+# 查看结果
+lsblk
+```
+
+## 安装系统基本软件包
+
+```bash
+# bash-completion bash命令补全
+pacstrap /mnt base base-devel linux linux-firmware linux-headers 
+```
+
+## 生成 fstab 文件
+
+```bash
+# 用 -U 或 -L 选项设置 UUID 或卷标
+genfstab -U /mnt >> /mnt/etc/fstab
+
+# 查看生成的文件
+cat /mnt/etc/fstab
+```
+
+## 进入安装的系统
+
+```bash
+arch-chroot /mnt
+
+pacman -Syy
+```
+
+## 修改 root 密码
+
+```bash
+passwd
+```
+
+## 添加普通用户
+
+```bash
+echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel
+
+# classlate 为可自定义的新用户名字
+useradd -m classlate
+
+# 用户组
+usermod -aG wheel classlate
+
+passwd classlate
+```
+
+## 添加中国仓库源（可选）
+
+> [archlinuxcn](https://mirrors.tuna.tsinghua.edu.cn/help/archlinuxcn/)  
+
+```bash
+# 编辑 /etc/pacman.conf
+echo "\
+[archlinuxcn]
+Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/\$arch" >> /etc/pacman.conf
+
+# 查看源文件
+cat /etc/pacman.conf
+
+# 安装 keyring
+pacman -Syy archlinuxcn-keyring
+```
+
+## 时区
+
+```bash
+ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+hwclock --systohc
+```
+
+## 语言环境
+
+```bash
+echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen
+echo 'zh_CN.UTF-8 UTF-8' >> /etc/locale.gen
+
+cat /etc/locale.gen
+
+locale-gen
+
+echo 'LANG=en_US.UTF-8' > /etc/locale.conf
+
+cat /etc/locale.conf
+```
+
+## 网络配置
+
+```bash
+# 配置主机名
+# archlinux 为可自定义，
+echo archlinux > /etc/hostname
+
+# archlinux 为上面定义的主机名
+echo "\
+127.0.0.1	localhost
+::1		localhost
+127.0.1.1	archlinux.localdomain	archlinux" >> /etc/hosts
+
+# 查看 hosts
+cat /etc/hosts
+
+# 安装网络管理器
+pacman -S networkmanager
+# 自启动
+systemctl enable NetworkManager
+```
+
+## 配置引导程序
+
+> [systemd-boot](https://wiki.archlinux.org/title/Systemd-boot_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))
+
+```bash
+# amd-ucode / intel-ucode
+pacman -S efibootmgr amd-ucode
+
+# 安装 EFI 启动管理器
+bootctl --path=/boot install
+
+# 启动选单配置
+echo "\
+timeout 10
+default arch" >> /boot/loader/loader.conf 
+
+# 增加启动选项 arch
+## 其中的 nvme0n1p2 替换为前面 8300 的分区
+echo "\
+title Arch Linux
+linux /vmlinuz-linux
+initrd /initramfs-linux.img
+options root=PARTUUID=`blkid -s PARTUUID -o value /dev/nvme0n1p2` rw rootflags=subvol=@" > /boot/loader/entries/arch.conf
+
+# 增加启动选项 arch-fallback
+## 其中的 nvme0n1p2 替换为前面 8300 的分区
+echo "\
+title Arch Linux
+linux /vmlinuz-linux
+initrd /initramfs-linux-fallback.img
+options root=PARTUUID=`blkid -s PARTUUID -o value /dev/nvme0n1p2` rw rootflags=subvol=@" > /boot/loader/entries/arch-fallback.conf
+```
+
+## 显卡驱动
+
+```bash
+# amd
+## GCN 3(不包含) 之前的需要安装 xf86-video-ati 替换 xf86-video-amdgpu
+## 现在新电脑无脑 xf86-video-amdgpu 就可以
+pacman -S xf86-video-amdgpu vulkan-radeon mesa
+
+# inter（未自测）
+pacman -S xf86-video-inter vulkan-inter mesa
+
+# nvidia（未自测）
+pacman -S nvidia nvidia-setings nvidia-utils
+```
+
+## 字体
+
+> [Fonts](https://wiki.archlinux.org/title/Fonts_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))
+
+```bash
+# 英文
+pacman -S ttf-dejavu 
+
+# 中文
+pacman -S wqy-zenhei wqy-microhei noto-fonts-cjk
+
+# emoji
+pacman -S noto-fonts-emoji
+```
+
+```bash
+# 更多可按需添加，部分罗列
+ttf-dejavu ttf-droid ttf-hack ttf-font-awesome otf-font-awesome ttf-lato ttf-liberation ttf-linux-libertine ttf-opensans ttf-roboto ttf-ubuntu-font-family 
+
+ttf-hannom noto-fonts noto-fonts-extra noto-fonts-emoji noto-fonts-cjk adobe-source-code-pro-fonts adobe-source-sans-fonts adobe-source-serif-fonts adobe-source-han-sans-cn-fonts adobe-source-han-sans-hk-fonts adobe-source-han-sans-tw-fonts adobe-source-han-serif-cn-fonts wqy-zenhei wqy-microhei
+```
+
+## 蓝牙
+
+> 安装的是虚拟机是不用安装，直接在虚拟机软件里使用宿主机的设备就可以
+
+```bash
+pacman -S bluez bluez-utils
+
+# 蓝牙服务自启动
+systemctl enable bluetooth
+```
+
+## 声音
+
+```bash
+pacman -S alsa-utils pulseaudio pulseaudio-bluetooth
+```
+
+## 打印机
+
+```bash
+pacman -S cups
+
+# 打印机服务自启动
+systemctl enable cups
+
+# kde 上的打印机 GUI 管理
+pacman -S print-manager
+```
+
+## 输入法
+
+```bash
+pacman -S fcitx5-im fcitx5-chinese-addons
+
+# 主题（可选）
+pacman -S fcitx5-material-color fcitx5-nord 
+paru -S fcitx5-breeze
+
+# 字库（推荐）
+## 需提前配置 archlinuxcn
+pacman -S fcitx5-pinyin-zhwiki fcitx5-pinyin-moegirl
+
+# 配置环境变量,以在应用程序中正常使用
+echo "\
+GTK_IM_MODULE=fcitx
+QT_IM_MODULE=fcitx
+XMODIFIERS=@im=fcitx" >> /etc/environment 
+```
+
+
+## 图形界面
+
+```bash
+pacman -S xorg 
+
+# 桌面环境 plasma & 显示管理器 sddm
+## plasma-wayland-session 可选
+pacman -S plasma sddm
+
+# sddm 自启动
+systemctl enable sddm
+
+# 一些应用
+## kde-applications 全套kde应用安装
+pacman -S kde-applications 
+## 也可以自己挑选单独的子软件包组按需安装 或 自己挑选安装独立的软件包
+## 下面依次为一些基础软件：文件管理器 浏览器 文本编辑器 终端
+pacman -S dolphin konqueror kwrite konsole
+
+# 一些可选工具
+pacman -S vim git openssh bash-completion reflector
+```
+
+## 重启进入系统界面
+
+> 安装完毕，至日常可用状态
+
+```bash
+# 退出 chroot 环境
+exit
+
+# 手动卸载被挂载的分区（可选）
+## 这有助于发现任何「繁忙」的分区，并通过 fuser(1) 查找原因
+umount -R /mnt
+
+# systemd 将自动卸载仍然挂载的任何分区
+reboot
+```
+
+## 更多（可选）
+
+### 软件包存档
+
+> [archive](https://archive.archlinux.org/packages/)
+
+### 启用 root 的 ssh 连接
+
+> 不推荐，不过可以在安装完后再改回去
+> `#PermitRootLogin prohibit-password`
+
+```bash
+# 需要先安装 ssh 才有这个文件
+pacman -S openssh
+
+vim /etc/ssh/sshd_config
+# 将 PermitRootLogin 值改为 yes 并取消注释
+```
+
+### 命令行配置网络
+
+```bash
+# 获取网络设备名称(因为新系统不一定与前面获取的一致)
+ip addr
+
+# 进入 tui
+nmtui
+
+# edit a connection
+# Add
+# Wi-Fi
+# Device: 网络设备名称
+# SSID: 无线名称
+# Security: WPA & WPA2 Personal
+# Password: 无线密码
+# Ok
+# Back
+# Quit
+
+ip addr
+
+# 测试网络连接
+ping -c 4 baidu.com
+```
+
+### AUR 
+
+> paru——一个 [aur助手](https://wiki.archlinux.org/title/AUR_helpers_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))，集成下载构建安装
+>
+
+```bash
+# 准备克隆
+pacman -S git
+
+git clone https://aur.archlinux.org/paru-bin
+
+cd paru-bin
+
+# （在非root用户下执行）
+makepkg -si
+
+# 使用帮助
+paru --help
+```
+
+### 清除缓存
+
+```bash
+pacman -Scc
+```
+
+###  freetype2 渲染
+
+```bash
+# freetype2 渲染
+vim /etc/profile.d/freetype2.sh 
+
+# 去除注释 export ...
+```
+
+### 禁用蜂鸣器
+
+```bash
+su
+
+rmmod pcspkr
+
+echo "blacklist pcspkr" >> /etc/modprobe.d/nobeep.conf
+
+exit
+```
+
+### ssd优化
+
+#### TRIM
+
+```bash
+pacman -S util-linux
+
+# 定时任务
+systemctl enable fstrim.timer
+```
+
+#### 性能
+
+> [arch wiki](https://wiki.archlinux.org/title/Solid_state_drive_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E6%8F%90%E5%8D%87%E6%80%A7%E8%83%BD)
+
+```bash
+# pacman -S nvme-cli
+```
+
+
+### discover: not application  back-ends found
+
+> [解决方案](https://wiki.archlinux.org/title/KDE_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#Discover%E4%B8%8D%E6%98%BE%E7%A4%BA%E4%BB%BB%E4%BD%95%E7%A8%8B%E5%BA%8F)
+>
+
+```bash
+pacman -S packagekit-qt5 
+```
+
+### KDE WALLET
+
+> `kde Writing login information to the keychain failed with error 'GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.secrets was not provided by any .service files'.`  
+> [github issue](https://github.com/microsoft/vscode/issues/104319)  
+> [pr](https://invent.kde.org/frameworks/kwallet/-/merge_requests/11#note_407985)  
+>
+
+```bash
+# 暂未合并, 目前可以通过 aur 安装
+paru -S kwallet-secrets
+
+# 或
+pacman -S gnome-keyring
+```
+
+### 固定DNS,以防被污染
+
+```bash
+vim /etc/resolv.conf
+
+# 填入以下内容
+nameserver 8.8.8.8
+nameserver 114.114.114.114
+
+# 只读文件保存并退出 :wq!
+
+# 防止程序覆盖 
+chattr +i /etc/resolv.conf
+```
+
+### makepfg
+
+[减少编译时间](https://wiki.archlinux.org/title/Makepkg_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E5%87%8F%E5%B0%91%E7%BC%96%E8%AF%91%E6%97%B6%E9%97%B4)
+
+```bash
+# 获得可用处理器的个数
+nproc
+
+vim /etc/makepkg.conf
+# 将 MAKEFLAGS 后面值中的数字部分改为不大于上面个数的数字，并取消注释
+```
+
+### linux 关机时间长
+
+> [通过减少默认停止超时来加快 Linux 中的关机速度](https://linux.cn/article-12635-1.html)
+
+```bash
+vim /etc/systemd/system.conf
+
+# 修改 DefaultTimeoutStopSec 并取消注释
+DefaultTimeoutStopSec=5s
+```
+
+### pacman 并行下载
+
+> 默认依次下载
+> 
+
+```bash
+vim /etc/pacman.conf
+# 修改 ParalleDownloads 为正整数，正整数就是所要并行下载的包的数量
+```
+
+### zram
+
+> [zram](https://wiki.archlinux.org/title/Improving_performance_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#zram_%E6%88%96_zswap)
+>
+> zramd: Automatically setup swap on zram
+
+```bash
+# 安装（其中某些文件可能需要T）
+paru -S zramd
+
+# 配置文件
+vim /etc/default/zramd
+
+# 启动
+systemctl enable --now zramd.service
+
+# 查看是否多出一个swap 设备
+lsblk
+```
+
+### sddm 开启虚拟键盘
+
+> [arch wiki](https://wiki.archlinux.org/title/SDDM#Enable_virtual_keyboard)
+
+```bash
+# 安装
+pacman -S qt5-virtualkeyboard
+
+# 配置
+# /etc/sddm.conf.d/virtualkbd.conf
+[General]
+InputMethod=qtvirtualkeyboard
+```
+

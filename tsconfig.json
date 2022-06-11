@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./docs/",
+    "target": "ESNext",
+    "module": "ESNext",
+    "types": ["vite/client"],
+    "isolatedModules": true,
+    "moduleResolution": "node",
+    "jsx": "preserve"
+  }
+}
