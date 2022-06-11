@@ -20,7 +20,7 @@ export default defineConfig({
     // logo: '',
     nav: [
       { text: '首页', link: '/' },
-      { text: '随笔', link: '/essays', activeMatch: '/tags|essays/' },
+      { text: '随笔', link: '/essays' },
       { text: '关于', link: '/about' },
     ],
     sidebar: {

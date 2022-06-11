@@ -1,7 +1,7 @@
 ---
-title: 测试标题
-titleTemplate: 后缀
-description: 测试描述
+title: ClassLate
+# # titleTemplate: 后缀
+description: 随笔
 editLink: true
 head:
   - - meta
