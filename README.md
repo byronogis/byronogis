@@ -1,5 +1,5 @@
 # classlate.github.io
 
-[classlate.github.oi](https://classlate.github.io)
+[classlate.github.io](https://classlate.github.io)
 
 ...
