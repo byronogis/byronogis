@@ -46,7 +46,7 @@ const backToTop = () => {
   // bottom: 20px;
   // right: 20px;
   // z-index: 999;
-  background: #fff;
+  color: var(--vp-c-text-2);
   border-radius: 5px;
   padding: 5px 10px;
   font-size: 16px;
