@@ -18,9 +18,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const allEssays = import.meta.globEager('/essays/**/*.md')
 
-const needEssays: PageData[] = Object.values(allEssays)
-  .map(essay => JSON.parse(essay.__pageData))
+const needEssays = Object.values(allEssays)
+  .map(essay => JSON.parse(essay.__pageData) as PageData)
   .filter(essay => props.tags ? essay.frontmatter?.tags?.includes(props.tags) : essay)
+  .sort((a, b) => +new Date(b.frontmatter.lastmod) - +new Date(a.frontmatter.lastmod))
 </script>
 
 <template>
