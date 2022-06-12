@@ -13,19 +13,13 @@ head:
 lastUpdated: true
 layout: home
 hero:
-  name: 随笔
+  # name: 随笔
   # text: 一些文本
   tagline: 谁知道下一个会记录什么...
-  # actions:
-  #   - theme: brand
-  #     text: 百度
-  #     link: https://www.baidu.com
-  #   - theme: alt
-  #     text: 微信
-  #     link: https://weixin.qq.com
-  #   - theme: alt
-  #     text: 微博
-  #     link: https://weibo.com
+  actions:
+    - theme: alt
+      text: 随笔
+      link: '/essays'
 # features:
 #   - icon: ⚡️
 #     title: Vite, The DX that can't be beat
