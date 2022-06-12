@@ -1,5 +1,5 @@
-# classlate.github.io
+# classlate-essays.netlify.app
 
-[classlate.github.io](https://classlate.github.io)
+[classlate-essays.netlify.app](https://classlate-essays.netlify.app)
 
 ...

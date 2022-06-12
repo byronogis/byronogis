@@ -35,7 +35,7 @@ export default defineConfig({
       copyright: 'Copyright © 2022-present ClassLate',
     },
     editLink: {
-      repo: 'classlate/classlate.github.io',
+      repo: 'classlate/essays',
       branch: 'main',
       dir: 'docs',
       text: 'Edit this page',
