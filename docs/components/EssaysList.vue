@@ -27,7 +27,7 @@ const needEssays: PageData[] = Object.values(allEssays)
   <div>
     <div v-for="({ relativePath, frontmatter }) in needEssays" :key="relativePath" class="essays-list-item">
       <div class="eli-title">
-        <a :href="`/${relativePath.slice(0, -3)}.html`" :title="`/${relativePath.slice(0, -3)}`">
+        <a :href="`/${relativePath.slice(0, -3)}.html`" :title="`/${relativePath.slice(0, -3)}`" class="eli-title-link">
           {{ frontmatter.title ?? '无标题' }}
         </a>
       </div>
@@ -36,10 +36,14 @@ const needEssays: PageData[] = Object.values(allEssays)
       </div>
       <div class="eli-other">
         <div class="eli-other-item eli-tag">
-          tags: {{ frontmatter.tags ?? '无标签' }}
+          标签:
+          <span v-for="tag in frontmatter.tags" :key="tag">
+            {{ tag }}
+            <span v-if="tag !== frontmatter.tags.at(-1)">, </span>
+          </span>
         </div>
         <div class="eli-other-item  eli-lastmod">
-          lastUpdated: {{ frontmatter.lastmod ?? '' }}
+          最后编辑: {{ frontmatter.lastmod ?? '' }}
         </div>
       </div>
     </div>
@@ -51,12 +55,18 @@ const needEssays: PageData[] = Object.values(allEssays)
   padding: 10px;
   border-bottom: 1px solid var(--vp-c-divider-light);
   .eli-title {
-    font-size: 16px;
+    font-size: 20px;
     font-weight: bold;
+    .eli-title-link::after {
+      content: '>>';
+      padding-left: 3px;
+      font-size: 12px;
+    }
   }
   .eli-desc {
+    margin: 6px 0 2px;
     font-size: 14px;
-    color: #666;
+    color: var(--vp-c-text-2);
   }
   .eli-other {
     display: flex;
@@ -65,7 +75,10 @@ const needEssays: PageData[] = Object.values(allEssays)
     align-items: center;
     .eli-other-item {
       font-size: 12px;
-      color: #666;
+      color: var(--vp-c-text-2);
+      &.eli-lastmod {
+        width: 160px;
+      }
     }
   }
 }
