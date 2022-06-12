@@ -20,7 +20,7 @@ head:
 
 在项目中遇到如下需求，将一条内部有依赖关系的扁平结构数据，转换为树形结构数据，其中属性 pid 对应其父节点的属性 id，属性 children 存放子节点，顶层（一级）pid 为 0
 
-<img src="https://img2020.cnblogs.com/blog/2554471/202112/2554471-20211205004705257-1853436535.png" alt="数据结构示意图" width="1000px" />
+![](./assets//digui-less-pressure-result//example.png)
 
 ## 常规递归解决
 
