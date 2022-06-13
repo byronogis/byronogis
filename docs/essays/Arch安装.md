@@ -31,7 +31,8 @@ head:
 
 ## 调整控制台字体（可选）
 
-> 以大号字体显示
+> [终端字体](https://wiki.archlinux.org/title/Linux_console_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E7%BB%88%E7%AB%AF%E5%AD%97%E4%BD%93)  
+> 以大号字体显示  
 
 ```bash
 setfont ter-132n
@@ -44,6 +45,8 @@ passwd
 ```
 
 ## 无线连接
+
+> [iwd: iNet wireless daemon](https://wiki.archlinux.org/title/Iwd_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
 
 ```bash
 iwctl
@@ -67,8 +70,8 @@ ping archlinux.org
 ## ssh 安装 （可选）
 
 > 以远控安装  
->
-> 远控安装时建议目标机器一直处于 ping 状态
+> 远控安装时建议目标机器一直处于 ping 状态  
+> [OpenSSH](https://wiki.archlinux.org/title/OpenSSH)  
 
 ```bash
 pacman -Syy openssh
@@ -87,6 +90,9 @@ ssh root@<ip>
 
 ## 生成镜像源
 
+> [镜像源](https://wiki.archlinux.org/title/Mirrors_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
+> [reflector](https://wiki.archlinux.org/title/Reflector_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
+
 ```bash
 # 先停用自动更新服务
 systemctl stop reflector.service
@@ -104,6 +110,7 @@ pacman -Syy
 
 ## 磁盘分区
 
+> [gPT fdisk](https://wiki.archlinux.org/title/GPT_fdisk_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))
 > gdisk 操作可见 [安装参考1（00：13）](#安装参考1) 
 
 ```bash
@@ -131,6 +138,9 @@ gdisk /dev/<disk>
 
 ## 格式化
 
+> [File systems](https://wiki.archlinux.org/title/File_systems_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
+> [创建文件系统](https://wiki.archlinux.org/title/File_systems_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E5%88%9B%E5%BB%BA%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F)
+
 ```bash
 lsblk
 
@@ -151,9 +161,9 @@ lsblk -f
 
 ## btrfs 子卷
 
-> 很大原因是为以后如果要使用 timeshift 的 btrfs 类型备份时做准备
->
-> [In BTRFS mode, snapshots are taken using the in-built features of the BTRFS filesystem. BTRFS snapshots are supported only on BTRFS systems having an Ubuntu-type subvolume layout (with @ and @home subvolumes).](https://github.com/linuxmint/timeshift)
+> [Btrfs](https://wiki.archlinux.org/title/Btrfs_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))
+> 很大原因是为以后如果要使用 timeshift 的 btrfs 类型备份时做准备  
+> [In BTRFS mode, snapshots are taken using the in-built features of the BTRFS filesystem. BTRFS snapshots are supported only on BTRFS systems having an Ubuntu-type subvolume layout (with @ and @home subvolumes).](https://github.com/linuxmint/timeshift)  
 
 ```bash
 # <part> 为 lsblk 中 8300 对应的分区名，如 `mount /dev/nvme0n1p2 /mnt`
@@ -169,6 +179,8 @@ umount /mnt
 ```
 
 ## 挂载
+
+> [挂载文件系统](https://wiki.archlinux.org/title/File_systems_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E6%8C%82%E8%BD%BD%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F)  
 
 ```bash
 # btrfsz子卷，<part> 为 lsblk 中 8300 对应的分区名，如 `nvme0n1p2`
@@ -192,12 +204,16 @@ lsblk
 
 ## 安装系统基本软件包
 
+> [安装必需的软件包](https://wiki.archlinux.org/title/Installation_guide_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E5%AE%89%E8%A3%85%E5%BF%85%E9%9C%80%E7%9A%84%E8%BD%AF%E4%BB%B6%E5%8C%85)  
+
 ```bash
 # bash-completion bash命令补全
 pacstrap /mnt base base-devel linux linux-firmware linux-headers 
 ```
 
 ## 生成 fstab 文件
+
+> [fstab](https://wiki.archlinux.org/title/Fstab_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
 
 ```bash
 # 用 -U 或 -L 选项设置 UUID 或卷标
@@ -208,6 +224,8 @@ cat /mnt/etc/fstab
 ```
 
 ## 进入安装的系统
+
+> [Chroot](https://wiki.archlinux.org/title/Chroot_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
 
 ```bash
 arch-chroot /mnt
@@ -222,6 +240,8 @@ passwd
 ```
 
 ## 添加普通用户
+
+> [用户管理](https://wiki.archlinux.org/title/Users_and_groups_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E7%94%A8%E6%88%B7%E7%AE%A1%E7%90%86)  
 
 ```bash
 echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel
@@ -254,6 +274,9 @@ pacman -Syy archlinuxcn-keyring
 
 ## 时区
 
+> [时区](https://wiki.archlinux.org/title/System_time#Time_zone)  
+> [硬件时钟](https://wiki.archlinux.org/title/System_time#Hardware_clock)  
+
 ```bash
 ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
@@ -261,6 +284,8 @@ hwclock --systohc
 ```
 
 ## 语言环境
+
+> [Locale](https://wiki.archlinux.org/title/Locale_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
 
 ```bash
 echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen
@@ -276,6 +301,8 @@ cat /etc/locale.conf
 ```
 
 ## 网络配置
+
+> [设置计算机名](https://wiki.archlinux.org/title/Network_configuration_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E8%AE%BE%E7%BD%AE%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%90%8D)  
 
 ```bash
 # 配置主机名
@@ -299,7 +326,8 @@ systemctl enable NetworkManager
 
 ## 配置引导程序
 
-> [systemd-boot](https://wiki.archlinux.org/title/Systemd-boot_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))
+> [systemd-boot](https://wiki.archlinux.org/title/Systemd-boot_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
+> [Microcode](https://wiki.archlinux.org/title/Microcode_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
 
 ```bash
 # amd-ucode / intel-ucode
@@ -331,6 +359,8 @@ options root=PARTUUID=`blkid -s PARTUUID -o value /dev/nvme0n1p2` rw rootflags=s
 ```
 
 ## 显卡驱动
+
+> [Xorg: 驱动安装](https://wiki.archlinux.org/title/Xorg_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E9%A9%B1%E5%8A%A8%E5%AE%89%E8%A3%85)  
 
 ```bash
 # amd
@@ -369,7 +399,8 @@ ttf-hannom noto-fonts noto-fonts-extra noto-fonts-emoji noto-fonts-cjk adobe-sou
 
 ## 蓝牙
 
-> 安装的是虚拟机是不用安装，直接在虚拟机软件里使用宿主机的设备就可以
+> [蓝牙](https://wiki.archlinux.org/title/Bluetooth_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
+> 安装在虚拟机可不用安装，直接在虚拟机软件里使用宿主机的设备就可以  
 
 ```bash
 pacman -S bluez bluez-utils
@@ -380,11 +411,16 @@ systemctl enable bluetooth
 
 ## 声音
 
+> [Advanced Linux Sound Architecture，ALSA](https://wiki.archlinux.org/title/Advanced_Linux_Sound_Architecture_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))    
+> [PulseAudio](https://wiki.archlinux.org/title/PulseAudio_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
+
 ```bash
 pacman -S alsa-utils pulseaudio pulseaudio-bluetooth
 ```
 
 ## 打印机
+
+> [CUPS](https://wiki.archlinux.org/title/CUPS_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
 
 ```bash
 pacman -S cups
@@ -397,6 +433,8 @@ pacman -S print-manager
 ```
 
 ## 输入法
+
+> [Fcitx5 是继 Fcitx 后的新一代输入法框架。](https://wiki.archlinux.org/title/Fcitx5_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
 
 ```bash
 pacman -S fcitx5-im fcitx5-chinese-addons
@@ -418,6 +456,11 @@ XMODIFIERS=@im=fcitx" >> /etc/environment
 
 
 ## 图形界面
+
+> [Xorg](https://wiki.archlinux.org/title/Xorg_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
+> [Desktop environment 桌面环境](https://wiki.archlinux.org/title/Desktop_environment_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
+> [Display manager 显示管理器](https://wiki.archlinux.org/title/Display_manager_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
+> [kde](https://wiki.archlinux.org/title/KDE_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
 
 ```bash
 pacman -S xorg 
@@ -476,6 +519,8 @@ vim /etc/ssh/sshd_config
 ```
 
 ### 命令行配置网络
+
+> [NetworkManager](https://wiki.archlinux.org/title/NetworkManager_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
 
 ```bash
 # 获取网络设备名称(因为新系统不一定与前面获取的一致)
@@ -673,4 +718,3 @@ pacman -S qt5-virtualkeyboard
 [General]
 InputMethod=qtvirtualkeyboard
 ```
-
