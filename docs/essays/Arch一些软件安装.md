@@ -156,7 +156,7 @@ pacman -S scrcpy
 paru -S qtscrcpy
 ```
 
-### v2ray 代理
+## v2ray 代理
 
 > [arch wiki 代理](https://wiki.archlinux.org/title/General_recommendations_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E4%BB%A3%E7%90%86)  
 > [arch&qv2ray使用](https://github.com/ArchLinuxStudio/ArchLinuxTutorial/blob/master/docs/rookie/transparentProxy.md)  
