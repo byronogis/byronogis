@@ -156,6 +156,34 @@ pacman -S scrcpy
 paru -S qtscrcpy
 ```
 
+### v2ray 代理
+
+> [arch wiki 代理](https://wiki.archlinux.org/title/General_recommendations_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E4%BB%A3%E7%90%86)  
+> [arch&qv2ray使用](https://github.com/ArchLinuxStudio/ArchLinuxTutorial/blob/master/docs/rookie/transparentProxy.md)  
+> [Qv2ray](https://github.com/Qv2ray/Qv2ray)  
+> [cgproxy 透明代理](https://github.com/springzfx/cgproxy)  
+
+```bash
+pacman -S v2ray
+
+# 图形界面管理及功能扩展
+paru -S qv2ray  qv2ray-plugin-ssr-git  qv2ray-plugin-command-git  cgproxy
+
+# cgproxy 配置文件
+vim /etc/cgproxy/config.json
+
+# 启用与停用
+systemctl start cgproxy.service
+systemctl stop cgproxy.service
+```
+
+```bash
+# 终端代理（当前会话）
+export https_proxy=http://127.0.0.1:8889
+export http_proxy=http://127.0.0.1:8889
+export all_proxy=http://127.0.0.1:8889
+```
+
 ## pacman 的一些参数使用
 
 > [pacman](https://wiki.archlinux.org/title/Pacman_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))
