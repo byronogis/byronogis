@@ -91,7 +91,7 @@ ssh root@<ip>
 ## 生成镜像源
 
 > [镜像源](https://wiki.archlinux.org/title/Mirrors_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
-> [reflector](https://wiki.archlinux.org/title/Reflector_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
+> [reflector](https://wiki.archlinux.org/title/Reflector_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))   
 
 ```bash
 # 先停用自动更新服务
@@ -110,8 +110,8 @@ pacman -Syy
 
 ## 磁盘分区
 
-> [gPT fdisk](https://wiki.archlinux.org/title/GPT_fdisk_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))
-> gdisk 操作可见 [安装参考1（00：13）](#安装参考1) 
+> [gPT fdisk](https://wiki.archlinux.org/title/GPT_fdisk_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
+> gdisk 操作可见 [安装参考1（00：13）](#安装参考1)  
 
 ```bash
 lsblk
@@ -139,7 +139,7 @@ gdisk /dev/<disk>
 ## 格式化
 
 > [File systems](https://wiki.archlinux.org/title/File_systems_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
-> [创建文件系统](https://wiki.archlinux.org/title/File_systems_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E5%88%9B%E5%BB%BA%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F)
+> [创建文件系统](https://wiki.archlinux.org/title/File_systems_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E5%88%9B%E5%BB%BA%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F)  
 
 ```bash
 lsblk
@@ -161,7 +161,7 @@ lsblk -f
 
 ## btrfs 子卷
 
-> [Btrfs](https://wiki.archlinux.org/title/Btrfs_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))
+> [Btrfs](https://wiki.archlinux.org/title/Btrfs_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
 > 很大原因是为以后如果要使用 timeshift 的 btrfs 类型备份时做准备  
 > [In BTRFS mode, snapshots are taken using the in-built features of the BTRFS filesystem. BTRFS snapshots are supported only on BTRFS systems having an Ubuntu-type subvolume layout (with @ and @home subvolumes).](https://github.com/linuxmint/timeshift)  
 
@@ -377,7 +377,7 @@ pacman -S nvidia nvidia-setings nvidia-utils
 
 ## 字体
 
-> [Fonts](https://wiki.archlinux.org/title/Fonts_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))
+> [Fonts](https://wiki.archlinux.org/title/Fonts_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
 
 ```bash
 # 英文
@@ -503,7 +503,7 @@ reboot
 
 ### 软件包存档
 
-> [archive](https://archive.archlinux.org/packages/)
+> [archive](https://archive.archlinux.org/packages/)  
 
 ### 启用 root 的 ssh 连接
 
@@ -520,7 +520,7 @@ vim /etc/ssh/sshd_config
 
 ### 命令行配置网络
 
-> [NetworkManager](https://wiki.archlinux.org/title/NetworkManager_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
+> [NetworkManager](https://wiki.archlinux.org/title/NetworkManager_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))   
 
 ```bash
 # 获取网络设备名称(因为新系统不一定与前面获取的一致)
@@ -548,7 +548,7 @@ ping -c 4 baidu.com
 
 ### AUR 
 
-> paru——一个 [aur助手](https://wiki.archlinux.org/title/AUR_helpers_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))，集成下载构建安装
+> paru——一个 [aur助手](https://wiki.archlinux.org/title/AUR_helpers_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))，集成下载构建安装  
 >
 
 ```bash
@@ -606,7 +606,7 @@ systemctl enable fstrim.timer
 
 #### 性能
 
-> [arch wiki](https://wiki.archlinux.org/title/Solid_state_drive_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E6%8F%90%E5%8D%87%E6%80%A7%E8%83%BD)
+> [arch wiki](https://wiki.archlinux.org/title/Solid_state_drive_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E6%8F%90%E5%8D%87%E6%80%A7%E8%83%BD)  
 
 ```bash
 # pacman -S nvme-cli
@@ -615,7 +615,7 @@ systemctl enable fstrim.timer
 
 ### discover: not application  back-ends found
 
-> [解决方案](https://wiki.archlinux.org/title/KDE_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#Discover%E4%B8%8D%E6%98%BE%E7%A4%BA%E4%BB%BB%E4%BD%95%E7%A8%8B%E5%BA%8F)
+> [解决方案](https://wiki.archlinux.org/title/KDE_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#Discover%E4%B8%8D%E6%98%BE%E7%A4%BA%E4%BB%BB%E4%BD%95%E7%A8%8B%E5%BA%8F)  
 >
 
 ```bash
@@ -624,9 +624,9 @@ pacman -S packagekit-qt5
 
 ### KDE WALLET
 
-> `kde Writing login information to the keychain failed with error 'GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.secrets was not provided by any .service files'.`  
+> `kde Writing login information to the keychain failed with error 'GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.secrets was not provided by any .service files'.`   
 > [github issue](https://github.com/microsoft/vscode/issues/104319)  
-> [pr](https://invent.kde.org/frameworks/kwallet/-/merge_requests/11#note_407985)  
+> [pr](https://invent.kde.org/frameworks/kwallet/-/merge_requests/11#note_407985)   
 >
 
 ```bash
@@ -654,7 +654,7 @@ chattr +i /etc/resolv.conf
 
 ### makepfg
 
-[减少编译时间](https://wiki.archlinux.org/title/Makepkg_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E5%87%8F%E5%B0%91%E7%BC%96%E8%AF%91%E6%97%B6%E9%97%B4)
+[减少编译时间](https://wiki.archlinux.org/title/Makepkg_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E5%87%8F%E5%B0%91%E7%BC%96%E8%AF%91%E6%97%B6%E9%97%B4)  
 
 ```bash
 # 获得可用处理器的个数
@@ -666,7 +666,7 @@ vim /etc/makepkg.conf
 
 ### linux 关机时间长
 
-> [通过减少默认停止超时来加快 Linux 中的关机速度](https://linux.cn/article-12635-1.html)
+> [通过减少默认停止超时来加快 Linux 中的关机速度](https://linux.cn/article-12635-1.html)  
 
 ```bash
 vim /etc/systemd/system.conf
@@ -687,7 +687,7 @@ vim /etc/pacman.conf
 
 ### zram
 
-> [zram](https://wiki.archlinux.org/title/Improving_performance_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#zram_%E6%88%96_zswap)
+> [zram](https://wiki.archlinux.org/title/Improving_performance_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#zram_%E6%88%96_zswap)  
 >
 > zramd: Automatically setup swap on zram
 
@@ -707,7 +707,7 @@ lsblk
 
 ### sddm 开启虚拟键盘
 
-> [arch wiki](https://wiki.archlinux.org/title/SDDM#Enable_virtual_keyboard)
+> [arch wiki](https://wiki.archlinux.org/title/SDDM#Enable_virtual_keyboard)  
 
 ```bash
 # 安装
