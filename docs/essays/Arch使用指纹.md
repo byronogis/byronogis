@@ -52,6 +52,7 @@ paru -S  pam-fprint-grosshack
 
 ```bash
 ## 特殊处理 sddm 和 kde 文件单独处理
+## https://wiki.archlinux.org/title/SDDM#Using_a_fingerprint_reader
 ## 为了使得不影响 kwallet 随登录自启动，开机第一次解锁时以数字密码解锁
 ## 后面屏幕解锁可在密码输入框直接回车，待提示指纹时已指纹解锁
 # sddm
