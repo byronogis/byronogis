@@ -2,7 +2,7 @@
 title: Arch 安装及初始化配置
 description: UEFI system-boot btrfs  @ @home kde plasma
 date: 	2022-05-31 23:28
-lastmod: 	2022-05-31 23:28
+lastmod: 	2022-06-13 10:40
 tags:
   - linux
   - arch
