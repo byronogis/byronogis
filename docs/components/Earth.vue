@@ -1,7 +1,7 @@
 <!--
  * @Author       : your name
  * @Date         : 2020-07-03 18:30:01
- * @LastEditTime : 2022-06-14 11:16:59
+ * @LastEditTime : 2022-06-14 17:12:03
  * @LastEditors  : Please set LastEditors
  * @Description  : In User Settings Edit
  * @FilePath     : \vd\src\views\webgl\t1.vue
@@ -9,7 +9,7 @@
 -->
 <script lang="ts">
 import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import Img from '/assets/map.jpg'
 
 export default {
@@ -32,7 +32,6 @@ export default {
         [-100, 0],
       ],
       posTracks: [],
-      width: window.innerHeight / 2,
     }
   },
 
@@ -61,7 +60,7 @@ export default {
       this.camera.lookAt(new THREE.Vector3(0, 0, 0))
       this.scene.add(this.camera)
 
-      this.controls = new OrbitControls(this.camera, this.renderer.domElement)// 创建控件对象
+      // this.controls = new OrbitControls(this.camera, this.renderer.domElement)// 创建控件对象
 
       // 添加光照
       this.light()
