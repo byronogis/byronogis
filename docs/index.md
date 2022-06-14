@@ -11,11 +11,11 @@ head:
     - name: keywords
       content: super duper SEO
 lastUpdated: true
-layout: home
+layout: doc
 hero:
   # name: 随笔
   # text: 一些文本
-  tagline: 谁知道下一个会记录什么...
+  tagline: 谁知道什么会发生在下一个...
   actions:
     - theme: alt
       text: 随笔
@@ -31,3 +31,5 @@ hero:
 #     title: Simple and minimal, always
 #     details: Lorem ipsum...
 ---
+
+<Home />

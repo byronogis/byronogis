@@ -3,7 +3,7 @@
     "baseUrl": "./docs/",
     "target": "ESNext",
     "module": "ESNext",
-    "types": ["vite/client"],
+    "types": ["vite/client", "node"],
     "isolatedModules": true,
     "moduleResolution": "node",
     "jsx": "preserve"
