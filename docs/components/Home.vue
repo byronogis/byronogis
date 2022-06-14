@@ -31,7 +31,7 @@ const timer = setInterval(() => {
       </button>
     </div>
 
-    <Earth />
+    <Earth class="home-earth" />
   </div>
 </template>
 
@@ -67,6 +67,10 @@ const timer = setInterval(() => {
     color: var(--vp-button-alt-text);
   }
 
+}
+
+.home-earth {
+  margin-top: 50px;
 }
 
 .v-enter-active,

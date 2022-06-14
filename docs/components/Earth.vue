@@ -1,7 +1,7 @@
 <!--
  * @Author       : your name
  * @Date         : 2020-07-03 18:30:01
- * @LastEditTime : 2022-06-14 17:12:03
+ * @LastEditTime : 2022-06-14 17:43:13
  * @LastEditors  : Please set LastEditors
  * @Description  : In User Settings Edit
  * @FilePath     : \vd\src\views\webgl\t1.vue
@@ -32,6 +32,11 @@ export default {
         [-100, 0],
       ],
       posTracks: [],
+      canvasStyle: {
+        width: '300px',
+        height: '300px',
+        borderRadius: '50%',
+      },
     }
   },
 
@@ -55,7 +60,7 @@ export default {
       this.scene = new THREE.Scene()
 
       // 相机
-      this.camera = new THREE.PerspectiveCamera(45, 500 / 500, 1, 1500)
+      this.camera = new THREE.PerspectiveCamera(35, 500 / 500, 1, 1500)
       this.camera.position.set(100, 100, 1000)
       this.camera.lookAt(new THREE.Vector3(0, 0, 0))
       this.scene.add(this.camera)
@@ -298,7 +303,7 @@ export default {
 
 <template>
   <div id="three-earth">
-    <canvas ref="thr" width="300" height="300" />
+    <canvas ref="thr" :style="canvasStyle" />
     <!-- <button @click="stop">
       Stop
     </button> -->
