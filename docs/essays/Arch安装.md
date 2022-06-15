@@ -172,8 +172,7 @@ lsblk
 ## 效果同 `mkfs.vfat /dev/<part>
 mkfs.fat -F 32 /dev/<part>
 
-# <part> 为 lsblk 中 8300 对应的分区名，如 `mkfs.btrfs /dev/nvme0n1p2`
-# 如果提示分区已经为该分区已经为XXX 可添加参数强制格式化，`mkfs.btrfs /dev/nvme0n1p2 -f`
+# <part> 为 lsblk 中 8300 对应的分区名，如 `nvme0n1p2`
 cryptsetup --cipher aes-xts-plain64 --hash sha512 --use-random --verify-passphrase luksFormat /dev/<part>
 YES
 cryptsetup luksOpen /dev/<part> root
@@ -356,7 +355,7 @@ vim /etc/mkinitcpio.conf
 
 # 对应修改，添加 btrfs encrypt, 注意位置顺序
 MODULES=(btrfs)
-HOOKS=(base udev autodetect modconf block encrypt filesystems resume keyboard fsck)
+HOOKS=(base udev autodetect modconf block encrypt filesystems keyboard fsck)
 
 # 生成新的参数配置
 mkinitcpio -p linux
@@ -394,7 +393,7 @@ echo "\
 title Arch Linux
 linux /vmlinuz-linux
 initrd /initramfs-linux-fallback.img
-options cryptdevice=UUID=`blkid -s UUID -o value /dev/nvme0n1p2`:root root=/dev/mapper/root resume=`blkid -s UUID -o value /dev/mapper/root` resume_offset=前面休眠部分最后计算得到的商 rw rootflags=subvol=@" > /boot/loader/entries/arch-fallback.conf
+options cryptdevice=UUID=`blkid -s UUID -o value /dev/nvme0n1p2`:root root=/dev/mapper/root rw rootflags=subvol=@" > /boot/loader/entries/arch-fallback.conf
 ```
 
 ## 显卡驱动
@@ -583,34 +582,34 @@ cd
 
 wget https://raw.githubusercontent.com/osandov/osandov-linux/master/scripts/btrfs_map_physical.c
 gcc -O2 -o btrfs_map_physical btrfs_map_physical.c
-./btrfs_map_physical /swap/swapfile
+./btrfs_map_physical /swap/file1
 
 # physical offset
-./btrfs_map_physical /swap/swapfile | cut -f 9 | head -2
+sudo ./btrfs_map_physical /swap/file1 | cut -f 9 | head -2
 
 # PAGESIZE
-getconf PAGESIZE
+sudo getconf PAGESIZE
 
 # physical offset / PAGESIZE，计算得到商，记好这个数字（ resume_offset ）
-blkid -s UUID -o value /dev/mapper/root # 记好这个值（ resume ）
+sudo blkid -s UUID -o value /dev/mapper/root # 记好这个值（ resume ）
 
 # 配置Initramfs
-vim /etc/mkinitcpio.conf
+sudo vim /etc/mkinitcpio.conf
 
 # 对应修改，添加 resume，注意位置顺序
 HOOKS=(base udev autodetect modconf block encrypt filesystems resume keyboard fsck)
 
 # 生成新的参数配置
-mkinitcpio -p linux
+sudo mkinitcpio -p linux
 
 # 配置引导程序
-vim /boot/loader/entries/arch.conf
+sudo vim /boot/loader/entries/arch.conf
 
 # 最后一行 options 追加，注意不要另起一行
 resume=上面记好的resume resume_offset=上面记好的resume_offset 
 
 # 同上面的 arch.conf, 追加一样的内容
-vim /boot/loader/entries/arch-fallback.conf
+sudo vim /boot/loader/entries/arch-fallback.conf
 
 # 重启以应用
 reboot
