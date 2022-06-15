@@ -64,7 +64,7 @@ device list
 # <name> 为 device list 打印列表你中的名字，如 `station wlan0 scan`
 station <name> scan
 
-station <name> get-network
+station <name> get-networks
 
 # <ssid> 为 wifi名称
 station <name> connect <ssid>
