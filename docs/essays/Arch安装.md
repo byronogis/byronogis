@@ -2,7 +2,7 @@
 title: Arch 安装及初始化配置
 description: UEFI system-boot btrfs  @ @home kde plasma
 date: 	2022-05-31 23:28
-lastmod: 	2022-06-13 10:40
+lastmod: 	2022-06-15 10:59
 tags:
   - linux
   - arch
@@ -692,6 +692,9 @@ vim /etc/pacman.conf
 > zramd: Automatically setup swap on zram
 
 ```bash
+# 禁用zswap
+echo 0 > /sys/module/zswap/parameters/enabled
+
 # 安装（其中某些文件可能需要T）
 paru -S zramd
 
