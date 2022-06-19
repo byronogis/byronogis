@@ -2,14 +2,14 @@
 title: Arch 安装及初始化配置
 description: UEFI system-boot btrfs  @ @home kde plasma
 date: 	2022-05-31 23:28
-lastmod: 	2022-06-15 21:38
+lastmod: 	2022-06-19 22:00
 tags:
   - linux
   - arch
 head:
   - - meta
     - name: keywords
-      content: Arch 安装 UEFI system-boot crypt btrfs  @ @home @var @swap kde plasma sddm 休眠 交换文件 timeshift
+      content: Arch 安装 UEFI system-boot crypt btrfs  @ @home @var @swap kde plasma sddm 休眠 交换文件 timeshift aur aur-helper
 ---
 
 > [arch wiki](https://wiki.archlinux.org/title/Installation_guide_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
@@ -77,18 +77,22 @@ ping archlinux.org
 
 ## ssh 安装 （可选）
 
-> 以远控安装  
+> 以远控安装, cv用起来～  
 > 远控安装时建议目标机器一直处于 ping 状态  
 > [OpenSSH](https://wiki.archlinux.org/title/OpenSSH)  
 
 ```bash
-pacman -Syy openssh
+# openssh 在安装环境下已经预置了，不需要再安装
+# pacman -Syy openssh
 
+# 启动服务
 systemctl start sshd
 
 # 查看 ip
 ip addr
 ```
+
+### ssh 连接
 
 ```bash
 # 另一台电脑 提示输入密码为前面设置的 root 密码
@@ -128,9 +132,9 @@ pacman -Syy
 ## 磁盘分区
 
 > [gPT fdisk](https://wiki.archlinux.org/title/GPT_fdisk_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
-> gdisk 操作可见 [安装参考1（00：13）](#安装参考1)  
 
 ```bash
+# 查看磁盘及分区
 lsblk
 
 # <disk> 为 lsblk 中对应的磁盘名，如 `gdisk /dev/nvme0n1`
@@ -158,6 +162,9 @@ w
 
 # 确认分区
 Y
+
+# 查看磁盘分区情况
+gdisk -l /dev/<disk>
 ```
 
 ## 格式化
@@ -172,11 +179,12 @@ lsblk
 ## 效果同 `mkfs.vfat /dev/<part>
 mkfs.fat -F 32 /dev/<part>
 
-# <part> 为 lsblk 中 8300 对应的分区名，如 `nvme0n1p2`
-cryptsetup --cipher aes-xts-plain64 --hash sha512 --use-random --verify-passphrase luksFormat /dev/<part>
+# <part> 为 lsblk 中 8300 对应的分区名，如 `cryptsetup luksFormat /dev/nvme0n1p2`
+cryptsetup luksFormat /dev/<part>
 YES
-cryptsetup luksOpen /dev/<part> root
-mkfs.btrfs /dev/mapper/root
+# 下面的 cryptroot 可自定义，但要注意后边的要和自定义的一致  
+cryptsetup luksOpen /dev/<part> cryptroot
+mkfs.btrfs /dev/mapper/cryptroot
 
 # 查看格式化结果
 lsblk -f
@@ -189,8 +197,8 @@ lsblk -f
 > [In BTRFS mode, snapshots are taken using the in-built features of the BTRFS filesystem. BTRFS snapshots are supported only on BTRFS systems having an Ubuntu-type subvolume layout (with @ and @home subvolumes).](https://github.com/linuxmint/timeshift)  
 
 ```bash
-# <part> 为 lsblk 中 8300 对应的分区名，如 `mount /dev/nvme0n1p2 /mnt`
-mount /dev/mapper/root /mnt
+# 先挂载根分区，用以在根分区上创建 btrfs 子卷  
+mount /dev/mapper/cryptroot /mnt
 
 # 添加子卷 @ @home @var @swap
 btrfs subvolume create /mnt/@
@@ -208,17 +216,22 @@ umount /mnt
 > [挂载文件系统](https://wiki.archlinux.org/title/File_systems_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E6%8C%82%E8%BD%BD%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F)  
 
 ```bash
-mount -o noatime,space_cache=v2,compress=zstd,ssd,discard=async,subvol=@ /dev/mapper/root /mnt 
+# 挂载 @
+mount -o noatime,space_cache=v2,compress=zstd,ssd,discard=async,subvol=@ /dev/mapper/cryptroot /mnt 
 
 # 创建@home 及 efi 等挂载位置
 mkdir -p /mnt/{boot,home,var,swap}
 
-mount -o noatime,space_cache=v2,compress=zstd,ssd,discard=async,subvol=@home /dev/mapper/root /mnt/home
+# 挂载 @home
+mount -o noatime,space_cache=v2,compress=zstd,ssd,discard=async,subvol=@home /dev/mapper/cryptroot /mnt/home
 
-mount -o noatime,space_cache=v2,compress=zstd,ssd,discard=async,subvol=@var /dev/mapper/root /mnt/var
+# 挂载 @var
+mount -o noatime,space_cache=v2,compress=zstd,ssd,discard=async,subvol=@var /dev/mapper/cryptroot /mnt/var
 
-mount -o noatime,space_cache=v2,ssd,subvol=@swap /dev/mapper/root /mnt/swap
+# 挂载 @swap
+mount -o noatime,space_cache=v2,ssd,subvol=@swap /dev/mapper/cryptroot /mnt/swap
 
+# 挂载 efi
 # <part> 为 lsblk 中 ef00 对应的分区名，如 `mount /dev/nvme0n1p1 /mnt/boot`
 mount /dev/<part> /mnt/boot
 
@@ -231,7 +244,8 @@ lsblk
 > [安装必需的软件包](https://wiki.archlinux.org/title/Installation_guide_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E5%AE%89%E8%A3%85%E5%BF%85%E9%9C%80%E7%9A%84%E8%BD%AF%E4%BB%B6%E5%8C%85)  
 
 ```bash
-pacstrap /mnt base base-devel linux linux-firmware linux-headers btrfs-progs vim 
+# btrfs-progs  btrfs 所需
+pacstrap /mnt base base-devel linux linux-firmware linux-headers btrfs-progs 
 ```
 
 ## 生成 fstab 文件
@@ -269,12 +283,13 @@ passwd
 ```bash
 echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel
 
-# classlate 为可自定义的新用户名字
+# classlate 可自定义，但要注意后边的要和自定义的一致  
 useradd -m classlate
 
 # 用户组
 usermod -aG wheel classlate
 
+# 配置密码
 passwd classlate
 ```
 
@@ -288,7 +303,7 @@ echo "\
 [archlinuxcn]
 Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/\$arch" >> /etc/pacman.conf
 
-# 查看源文件
+# 查看编辑结果
 cat /etc/pacman.conf
 
 # 安装 keyring
@@ -329,7 +344,7 @@ cat /etc/locale.conf
 
 ```bash
 # 配置主机名
-# archlinux 为可自定义，
+# archlinux 可自定义，但要注意后边的要和自定义的一致  
 echo archlinux > /etc/hostname
 
 # archlinux 为上面定义的主机名
@@ -351,6 +366,10 @@ systemctl enable NetworkManager
 ## 配置Initramfs
 
 ```bash
+# 先安装一下 vim，一个编辑器
+pacman -Sy vim
+
+# 编辑文件
 vim /etc/mkinitcpio.conf
 
 # 对应修改，添加 btrfs encrypt, 注意位置顺序
@@ -380,20 +399,24 @@ timeout 10
 default arch" >> /boot/loader/loader.conf 
 
 # 增加启动选项 arch
-## 其中的 nvme0n1p2 替换为前面 8300 的分区
-echo "\
+## 其中的 nvme0n1p2 替换为前面 8300 对应的分区
+## 其中的 nvme0n1p2 替换为前面 8300 对应的分区
+## 其中的 nvme0n1p2 替换为前面 8300 对应的分区
+echo -e "\
 title Arch Linux
 linux /vmlinuz-linux
 initrd /initramfs-linux.img
-options cryptdevice=UUID=`blkid -s UUID -o value /dev/nvme0n1p2`:root root=/dev/mapper/root rw rootflags=subvol=@" > /boot/loader/entries/arch.conf
+options cryptdevice=UUID=`blkid -s UUID -o value /dev/nvme0n1p2`:cryptroot root=/dev/mapper/cryptroot rw rootflags=subvol=@ \c" > /boot/loader/entries/arch.conf
 
 # 增加启动选项 arch-fallback
-## 其中的 nvme0n1p2 替换为前面 8300 的分区
-echo "\
+## 其中的 nvme0n1p2 替换为前面 8300 对应的分区
+## 其中的 nvme0n1p2 替换为前面 8300 对应的分区
+## 其中的 nvme0n1p2 替换为前面 8300 对应的分区
+echo -e "\
 title Arch Linux
 linux /vmlinuz-linux
 initrd /initramfs-linux-fallback.img
-options cryptdevice=UUID=`blkid -s UUID -o value /dev/nvme0n1p2`:root root=/dev/mapper/root rw rootflags=subvol=@" > /boot/loader/entries/arch-fallback.conf
+options cryptdevice=UUID=`blkid -s UUID -o value /dev/nvme0n1p2`:cryptroot root=/dev/mapper/cryptroot rw rootflags=subvol=@ \c" > /boot/loader/entries/arch-fallback.conf
 ```
 
 ## 显卡驱动
@@ -465,9 +488,6 @@ pacman -S cups
 
 # 打印机服务自启动
 systemctl enable cups
-
-# kde 上的打印机 GUI 管理（可选）
-pacman -S print-manager
 ```
 
 ## 输入法
@@ -483,6 +503,7 @@ paru -S fcitx5-breeze
 
 # 字库（推荐）
 # fcitx5-pinyin-moegirl，可选，需提前配置 archlinuxcn
+# fcitx5-pinyin-zhwiki，之前也是需要配置 archlinuxcn 的，现在已经包含到启用的默认源中了
 pacman -S fcitx5-pinyin-zhwiki
 
 # 配置环境变量,以在应用程序中正常使用
@@ -490,6 +511,9 @@ echo "\
 GTK_IM_MODULE=fcitx
 QT_IM_MODULE=fcitx
 XMODIFIERS=@im=fcitx" >> /etc/environment 
+
+# 检查编辑结果
+cat /etc/environment 
 ```
 
 
@@ -513,14 +537,22 @@ systemctl enable sddm
 # 一些应用
 ## kde-applications 全套kde应用安装
 pacman -S kde-applications 
-## 也可以自己挑选单独的子软件包组按需安装 或 自己挑选安装独立的软件包
-## 下面依次为一些基础软件：文件管理器 浏览器 文本编辑器 终端
+## 1. 也可以自己挑选单独的子软件包组按需安装 
+### https://archlinux.org/packages/extra/any/kde-applications-meta/
+pacman -S kde-accessibility-meta kde-system-meta ...
+## 2. 或单独安装几个 kde 提供的软件：文件管理器 浏览器 文本编辑器 终端
 pacman -S dolphin konqueror kwrite konsole
+## 3. 或自己挑选安装其它独立的软件包
+pacman -S chromium kate ...
 
-# 一些可选工具
+# 一些工具软件（可选）
+# vim 终端中的文本编辑器
+# git 分布式版本管理工具
+# openssh ssh
 # bash-completion bash命令补全
 # reflector 镜像列表生成
-pacman -S vim git openssh bash-completion reflector
+# print-manager kde 上的打印机 GUI 管理
+pacman -S vim git openssh bash-completion reflector print-manager 
 ```
 
 ## 重启进入系统界面
@@ -541,35 +573,61 @@ reboot
 
 ## 交换文件（推荐）
 
-> [Btrfs: 交换文件](https://wiki.archlinux.org/title/Btrfs_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E4%BA%A4%E6%8D%A2%E6%96%87%E4%BB%B6)  
-> [Swap](https://wiki.archlinux.org/title/Swap_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E4%BA%A4%E6%8D%A2%E6%96%87%E4%BB%B6)  
+> [Btrfs: 交换文件](https://wiki.archlinux.org/title/Btrfs#Swap_file)  
+> [Swap File](https://wiki.archlinux.org/title/Swap#Manually)  
 > [swap 分区大小参考](https://blog.csdn.net/sirchenhua/article/details/87861709)  
 
+### 创建交换文件
+
 ```bash
+# root 用户模式
 su
 
+# 禁用写时复制
+## /swap 就是前面挂载 @swap 子卷的位置
+### [参数 C](https://man.archlinux.org/man/chattr.1#C)
 chattr +C /swap
 
-truncate -s 0 ./file1
+# swapfile 可自定义，但要注意后边的要和自定义的一致 
+truncate -s 0 /swap/swapfile
 
-# bs 与 count 的乘积为内存的1-1.5倍，我的内存是32G, 设置 40960 为40G
-dd if=/dev/zero of=/swap/file1 bs=1M count=40960 status=progress
+# bs 与 count 的乘积为内存的1-1.5倍，我的内存是32G, 设置 40960 为40G （40 * 1024）
+dd if=/dev/zero of=/swap/swapfile bs=1M count=40960 status=progress
 
-chmod 600 /swap/file1
+# 权限设置 仅所有者可读写，目前在 su 下，所有者是 root
+chmod 600 /swap/swapfile
 
-mkswap -U clear /swap/file1
+# 格式化为 swap 分区
+mkswap -U clear /swap/swapfile
 
-swapon /swap/file1
+# 启用 swap
+swapon /swap/swapfile
 
 # 编辑表文件
-echo '/swap/file1 none swap defaults 0 0' >> /etc/fstab
+echo '/swap/swapfile none swap defaults 0 0' >> /etc/fstab
 
 # 检查
 cat /proc/swaps
+free -h
+```
+
+### 删除交换文件
+
+```bash
+# 先关闭 swap
+swapoff /swap/swapfile
+
+# 然后删除文件
+rm -rf /swap/swapfile
+
+# 编辑 /etc/fstab 移除创建时添加的行
+## 如移除：/swap/swapfile none swap defaults 0 0
+vim /etc/fstab
 ```
 
 ## 休眠（推荐）
 
+> 休眠到交换文件  
 > [休眠](https://wiki.archlinux.org/title/Power_management_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)/Suspend_and_hibernate_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E4%BC%91%E7%9C%A0)  
 >
 > [raw.githubusercontent.com 连接不上](#固定dns以防被污染)
@@ -577,21 +635,41 @@ cat /proc/swaps
 >
 
 ```bash
-pacman -S wget
-cd
+# wget 命令行下载工具
+# bc 命令行计算器
+pacman -S wget bc
 
+# 下载
 wget https://raw.githubusercontent.com/osandov/osandov-linux/master/scripts/btrfs_map_physical.c
+
+# 编译
 gcc -O2 -o btrfs_map_physical btrfs_map_physical.c
-./btrfs_map_physical /swap/file1
+
+# 执行
+./btrfs_map_physical /swap/swapfile
 
 # physical offset
-sudo ./btrfs_map_physical /swap/file1 | cut -f 9 | head -2
+## `sudo ./btrfs_map_physical /swap/swapfile` 的结果 PHYSICAL OFFSET 位于第九列，取不算行头对应的第一行的值
+sudo ./btrfs_map_physical /swap/swapfile | cut -f 9 | head -2 | tail -1
 
 # PAGESIZE
 sudo getconf PAGESIZE
 
-# physical offset / PAGESIZE，计算得到商，记好这个数字（ resume_offset ）
-sudo blkid -s UUID -o value /dev/mapper/root # 记好这个值（ resume ）
+# physical offset / PAGESIZE，计算得到商（ resume_offset ）
+echo `sudo ./btrfs_map_physical /swap/swapfile | cut -f 9 | head -2 | tail -1` / `sudo getconf PAGESIZE` | bc
+
+# 打印resume（ resume ）
+sudo blkid -s UUID -o value /dev/mapper/cryptroot 
+
+# 存到会话变量里
+export myresumeoffset=`echo \`sudo ./btrfs_map_physical /swap/swapfile | cut -f 9 | head -2 | tail -1\` / \`sudo getconf PAGESIZE\` | bc`
+export myresume=`sudo blkid -s UUID -o value /dev/mapper/cryptroot`
+
+# 配置引导程序
+## 在起初创建文件时使用了 -e 参数以及 \c 特殊字符，这两个作用就是在最后不添加换行符号
+## 以便在这里将新内容直接添加在 options 所在行
+echo "resume=UUID=$myresume resume_offset=$myresumeoffset" >> /boot/loader/entries/arch.conf
+echo "resume=UUID=$myresume resume_offset=$myresumeoffset" >> /boot/loader/entries/arch-fallback.conf
 
 # 配置Initramfs
 sudo vim /etc/mkinitcpio.conf
@@ -602,22 +680,14 @@ HOOKS=(base udev autodetect modconf block encrypt filesystems resume keyboard fs
 # 生成新的参数配置
 sudo mkinitcpio -p linux
 
-# 配置引导程序
-sudo vim /boot/loader/entries/arch.conf
-
-# 最后一行 options 追加，注意不要另起一行
-resume=上面记好的resume resume_offset=上面记好的resume_offset 
-
-# 同上面的 arch.conf, 追加一样的内容
-sudo vim /boot/loader/entries/arch-fallback.conf
-
 # 重启以应用
 reboot
 
 # 验证
 while true ; do date ; sleep 1 ; done
 
-# 重新开一个终端，休眠
+# 重新开一个终端
+# 休眠
 systemctl hibernate
 
 # 然后开机，查看用于验证的终端是否再继续打印，以及中间有一段时间的空闲，那是电脑休眠的时间
@@ -649,7 +719,11 @@ paru --help
 > 快照备份
 
 ```bash
-paru -S timeshift-bin timeshift-autosnap
+paru -S timeshift-bin 
+
+# 自动备份（可选）
+## 更新时自动增加更新前的快照
+paru -S timeshift-autosnap
 ```
 
 
@@ -806,17 +880,20 @@ vim /etc/makepkg.conf
 vim /etc/systemd/system.conf
 
 # 修改 DefaultTimeoutStopSec 并取消注释
+## 如 5秒
 DefaultTimeoutStopSec=5s
 ```
 
-### pacman 并行下载
-
-> 默认依次下载
-> 
+### pacman 一些偏好设置
 
 ```bash
 vim /etc/pacman.conf
-# 修改 ParalleDownloads 为正整数，正整数就是所要并行下载的包的数量
+
+# 并行下载（默认依次下载）
+## 修改 ParalleDownloads 为正整数，正整数就是所要并行下载的包的数量
+
+# 升级前对比版本
+## 要查看旧版和新版的有效安装包，请取消/etc/pacman.conf中"VerbosePkgLists"的注释
 ```
 
 ### zram
