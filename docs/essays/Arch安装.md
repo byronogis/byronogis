@@ -82,7 +82,7 @@ ping archlinux.org
 > [OpenSSH](https://wiki.archlinux.org/title/OpenSSH)  
 
 ```bash
-# openssh 在安装环境下已经预置了，不需要再安装
+# openssh 在安装环境下已经预置了，不需要再安装, 验证 `pacman -Qi openssh`
 # pacman -Syy openssh
 
 # 启动服务
@@ -180,9 +180,9 @@ lsblk
 mkfs.fat -F 32 /dev/<part>
 
 # <part> 为 lsblk 中 8300 对应的分区名，如 `cryptsetup luksFormat /dev/nvme0n1p2`
+# 下面的 cryptroot 可自定义，但要注意后边安装过程也要保持一致  
 cryptsetup luksFormat /dev/<part>
 YES
-# 下面的 cryptroot 可自定义，但要注意后边的要和自定义的一致  
 cryptsetup luksOpen /dev/<part> cryptroot
 mkfs.btrfs /dev/mapper/cryptroot
 
@@ -193,7 +193,7 @@ lsblk -f
 ## btrfs 子卷
 
 > [Btrfs](https://wiki.archlinux.org/title/Btrfs_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
-> 很大原因是为以后如果要使用 timeshift 的 btrfs 类型备份时做准备  
+> 很大原因是为以后如果要使用 timeshift 的 btrfs 类型备份时做预备  
 > [In BTRFS mode, snapshots are taken using the in-built features of the BTRFS filesystem. BTRFS snapshots are supported only on BTRFS systems having an Ubuntu-type subvolume layout (with @ and @home subvolumes).](https://github.com/linuxmint/timeshift)  
 
 ```bash
@@ -296,6 +296,7 @@ passwd classlate
 ## 添加中国仓库源（可选）
 
 > [archlinuxcn](https://mirrors.tuna.tsinghua.edu.cn/help/archlinuxcn/)  
+> [Official repositories](https://wiki.archlinux.org/title/Official_repositories)  
 
 ```bash
 # 编辑 /etc/pacman.conf
@@ -540,10 +541,8 @@ pacman -S kde-applications
 ## 1. 也可以自己挑选单独的子软件包组按需安装 
 ### https://archlinux.org/packages/extra/any/kde-applications-meta/
 pacman -S kde-accessibility-meta kde-system-meta ...
-## 2. 或单独安装几个 kde 提供的软件：文件管理器 浏览器 文本编辑器 终端
-pacman -S dolphin konqueror kwrite konsole
-## 3. 或自己挑选安装其它独立的软件包
-pacman -S chromium kate ...
+## 2. 或单独安装所需的软件：文件管理器 浏览器 文本编辑器 终端
+pacman -S dolphin chromium kwrite konsole
 
 # 一些工具软件（可选）
 # vim 终端中的文本编辑器
