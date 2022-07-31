@@ -2,7 +2,7 @@
 title: fnm node版本管理工具
 description: Fast Node Manager
 date: 	2022-05-03 19:47
-lastmod: 	2022-05-03 19:47
+lastmod: 	2022-07-31 19:54
 tags:
   - 软件记录
   - wsl
@@ -18,6 +18,8 @@ head:
 
 ## 安装
 
+### linux
+
 ```bash
 # 初始安装
 curl -fsSL https://fnm.vercel.app/install | bash
@@ -30,6 +32,27 @@ curl -fsSL https://fnm.vercel.app/install | bash -s -- --skip-shell
 - eval "$(fnm env)"
 + eval "$(fnm env --use-on-cd --node-dist-mirror=https://repo.huaweicloud.com/nodejs/)"
 ```
+
+### windows
+
+> [scoop/choco/cargo](https://github.com/Schniz/fnm#manually)
+
+#### with cargo
+
+1. [Install Rust and Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html)
+2. `cargo install fnm`
+3. edit `.bashrc`
+
+  > [Git Bash issues](https://github.com/Schniz/fnm/issues/390#issuecomment-776240883)
+
+  ```bash
+  eval $(fnm env | sed 1d)
+  export PATH=$(cygpath $FNM_MULTISHELL_PATH):$PATH
+
+  if [[ -f .node-version || -f .nvmrc ]]; then
+      fnm use
+  fi
+  ```
 
 ## 常用命令
 
