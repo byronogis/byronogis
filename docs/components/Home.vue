@@ -30,8 +30,6 @@ const timer = setInterval(() => {
         <a href="/essays" class="home-btn-link">随笔</a>
       </button>
     </div>
-
-    <Earth class="home-earth" />
   </div>
 </template>
 
@@ -67,19 +65,5 @@ const timer = setInterval(() => {
     color: var(--vp-button-alt-text);
   }
 
-}
-
-.home-earth {
-  margin-top: 50px;
-}
-
-.v-enter-active,
-.v-leave-active {
-  transition: opacity 1.5s ease;
-}
-
-.v-enter-from,
-.v-leave-to {
-  opacity: 0;
 }
 </style>
