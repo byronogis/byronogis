@@ -4,8 +4,8 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   base: '/',
   lang: 'zh-CN',
-  title: 'ClassLate',
-  titleTemplate: 'ClassLate',
+  title: 'Liam',
+  titleTemplate: 'Liam\'s site',
   description: 'Essays',
   appearance: true,
   lastUpdated: true,
@@ -16,7 +16,7 @@ export default defineConfig({
     // config: (md) => {},
   },
   themeConfig: {
-    siteTitle: '着香槟的猫头鹰',
+    siteTitle: 'Liam\'s site',
     // logo: '',
     nav: [
       { text: '首页', link: '/' },
@@ -28,14 +28,14 @@ export default defineConfig({
       '/tags/': sidebarTags(),
     },
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/classlate' },
+      { icon: 'github', link: 'https://github.com/liamrad' },
     ],
     footer: {
       message: 'Released under the MIT License.',
-      copyright: 'Copyright © 2022-present ClassLate',
+      copyright: 'Copyright © 2022-present Liam Shi',
     },
     editLink: {
-      repo: 'classlate/classlate',
+      repo: 'liamrad/liamrad',
       branch: 'main',
       dir: 'docs',
       text: 'Edit this page',

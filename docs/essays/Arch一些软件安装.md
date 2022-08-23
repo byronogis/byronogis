@@ -69,7 +69,7 @@ virtualbox-host-dkms		 # 其它 如:linux-lts
 modprobe vboxdrv
 
 # 添加用户到 vboxusers 用户组
-usermod -aG vboxusers classlate
+usermod -aG vboxusers liamrad
 
 # 安装功能扩展包 或配置archlinuxcn 后直接 pacman
 paru -S  virtualbox-ext-oracle

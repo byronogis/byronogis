@@ -283,14 +283,14 @@ passwd
 ```bash
 echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel
 
-# classlate 可自定义，但要注意后边的要和自定义的一致  
-useradd -m classlate
+# liamrad 可自定义，但要注意后边的要和自定义的一致  
+useradd -m liamrad
 
 # 用户组
-usermod -aG wheel classlate
+usermod -aG wheel liamrad
 
 # 配置密码
-passwd classlate
+passwd liamrad
 ```
 
 ## 添加中国仓库源（可选）

@@ -1,1 +1,5 @@
+---
+title: Essays
+---
+
 <EssaysList />

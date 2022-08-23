@@ -1,5 +1,5 @@
 ---
-title: ClassLate
+title: Home
 # # titleTemplate: 后缀
 description: 随笔
 editLink: true

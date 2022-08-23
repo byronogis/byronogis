@@ -1,5 +1,5 @@
-# classlate.netlify.app
+# liamrad.netlify.app
 
-[classlate.netlify.app](https://classlate.netlify.app)
+[liamrad.netlify.app](https://liamrad.netlify.app)
 
 ...
