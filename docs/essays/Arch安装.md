@@ -2,14 +2,14 @@
 title: Arch 安装及初始化配置
 description: UEFI system-boot btrfs  @ @home kde plasma
 date: 	2022-05-31 23:28
-lastmod: 	2022-06-19 22:00
+lastmod: 	2022-06-24 22:19
 tags:
   - linux
   - arch
 head:
   - - meta
     - name: keywords
-      content: Arch 安装 UEFI system-boot crypt btrfs  @ @home @var @swap kde plasma sddm 休眠 交换文件 timeshift aur aur-helper
+      content: Arch 安装 UEFI systemd-boot crypt btrfs  @ @home @var @swap kde plasma sddm 休眠 交换文件 timeshift aur aur-helper
 ---
 
 > [arch wiki](https://wiki.archlinux.org/title/Installation_guide_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
@@ -21,7 +21,7 @@ head:
 > [安装参考6](https://www.youtube.com/watch?v=HIXnT178TgI&list=PL-odKaUzOz3IT3FLQlXFaRVyNpWW1nj68&index=204) | 
 > [安装参考7](https://www.youtube.com/watch?v=BAQ78pBPjjc) |
 >
-> UEFI system-boot  
+> UEFI systemd-boot  
 >
 > crypt 磁盘加密 
 >  
@@ -397,7 +397,7 @@ bootctl --path=/boot install
 # 启动选单配置
 echo "\
 timeout 10
-default arch" >> /boot/loader/loader.conf 
+default arch.conf" >> /boot/loader/loader.conf 
 
 # 增加启动选项 arch
 ## 其中的 nvme0n1p2 替换为前面 8300 对应的分区
