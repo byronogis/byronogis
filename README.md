@@ -1,1 +1,1 @@
-- [byronogis.netlify.app](https://byronogis.netlify.app)
+- [blog](https://blog.ucatch.me)
