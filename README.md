@@ -1,1 +1,1 @@
-- [blog](https://blog.ucatch.me)
+- [website](https://byron/freva.net/)
